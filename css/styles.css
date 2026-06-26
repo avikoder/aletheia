@@ -1,0 +1,419 @@
+/* ============================================================
+   Aletheia — styles.css
+   Custom styling beyond Tailwind utilities: the breathing
+   animation, ambient atmosphere, and shared component classes.
+   ============================================================ */
+
+:root {
+  --breath-phase: 4s;            /* duration of one box-breathing phase */
+  --emerald: #34d399;
+  --indigo: #818cf8;
+}
+
+/* ---------- Base ---------- */
+* { -webkit-tap-highlight-color: transparent; }
+
+html { scroll-behavior: smooth; }
+
+body { text-rendering: optimizeLegibility; }
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Slim, themed scrollbars elsewhere */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.3); background-clip: content-box; }
+
+/* ---------- Ambient backdrop ---------- */
+.ambient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: 0.16;
+  animation: drift 26s ease-in-out infinite alternate;
+}
+.ambient-orb--emerald {
+  width: 46vw; height: 46vw;
+  top: -14vw; right: -10vw;
+  background: radial-gradient(circle, var(--emerald), transparent 68%);
+}
+.ambient-orb--indigo {
+  width: 40vw; height: 40vw;
+  bottom: -16vw; left: -12vw;
+  background: radial-gradient(circle, var(--indigo), transparent 68%);
+  animation-delay: -13s;
+}
+@keyframes drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(2vw, 3vh) scale(1.08); }
+}
+
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- Cards & shared ---------- */
+.card {
+  background: linear-gradient(180deg, rgba(23, 29, 38, 0.72), rgba(17, 22, 29, 0.72));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 24px 60px -28px rgba(0,0,0,0.7);
+  backdrop-filter: blur(12px);
+}
+
+.card-title { font-size: 0.95rem; font-weight: 600; color: #e2e8f0; letter-spacing: -0.01em; }
+.card-sub { font-size: 0.78rem; color: #94a3b8; margin-top: 0.15rem; }
+
+.field-label {
+  display: block;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #94a3b8;
+  margin-bottom: 0.55rem;
+  font-weight: 500;
+}
+
+.filter-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* ---------- Buttons ---------- */
+.icon-btn {
+  display: grid; place-items: center;
+  width: 38px; height: 38px;
+  border-radius: 0.7rem;
+  color: #94a3b8;
+  transition: all 0.18s ease;
+}
+.icon-btn:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
+.icon-btn:active { transform: scale(0.94); }
+
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1.3rem;
+  border-radius: 0.8rem;
+  font-size: 0.875rem; font-weight: 600;
+  color: #04130d;
+  background: linear-gradient(180deg, #4ade80, #34d399);
+  box-shadow: 0 8px 24px -8px rgba(52, 211, 153, 0.55);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+.btn-primary:hover { filter: brightness(1.05); box-shadow: 0 10px 30px -8px rgba(52, 211, 153, 0.7); }
+.btn-primary:active { transform: translateY(1px) scale(0.99); }
+
+.btn-ghost {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 0.8rem;
+  font-size: 0.85rem; font-weight: 500;
+  color: #cbd5e1;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.02);
+  transition: all 0.18s ease;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.18); color: #e2e8f0; }
+.btn-ghost:active { transform: scale(0.98); }
+
+/* ---------- Tabs ---------- */
+.tab-btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.95rem 0.95rem;
+  font-size: 0.875rem; font-weight: 500;
+  color: #94a3b8;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: color 0.18s ease, border-color 0.18s ease;
+}
+.tab-btn:hover { color: #cbd5e1; }
+.tab-btn.is-active { color: var(--emerald); border-bottom-color: var(--emerald); }
+
+/* ---------- Range / filter chips ---------- */
+.range-btn {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem; font-weight: 600;
+  border-radius: 0.55rem;
+  color: #94a3b8;
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: all 0.15s ease;
+}
+.range-btn:hover { color: #cbd5e1; border-color: rgba(255,255,255,0.16); }
+.range-btn.is-active { color: #04130d; background: var(--emerald); border-color: var(--emerald); }
+
+/* ---------- Emotion buttons ---------- */
+.emotion-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 0.4rem;
+  padding: 0.85rem 0.4rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.015);
+  color: #94a3b8;
+  transition: all 0.18s cubic-bezier(0.34, 1.56, 0.64, 1);
+  cursor: pointer;
+}
+.emotion-btn:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.16); }
+.emotion-btn .emotion-name { font-size: 0.72rem; font-weight: 500; }
+.emotion-btn.is-active {
+  color: #e2e8f0;
+  border-color: var(--ec, var(--emerald));
+  background: color-mix(in srgb, var(--ec, var(--emerald)) 14%, transparent);
+  box-shadow: 0 0 0 1px var(--ec, var(--emerald)) inset, 0 8px 20px -10px var(--ec, var(--emerald));
+}
+.emotion-btn.is-active .emotion-dot { box-shadow: 0 0 12px 1px var(--ec, var(--emerald)); }
+.emotion-dot {
+  width: 9px; height: 9px; border-radius: 50%;
+  background: var(--ec, var(--emerald));
+  transition: box-shadow 0.2s ease;
+}
+
+/* ---------- Distortion checkboxes ---------- */
+.distortion-item {
+  display: flex; align-items: flex-start; gap: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(255,255,255,0.07);
+  background: rgba(255,255,255,0.015);
+  cursor: pointer;
+  transition: all 0.16s ease;
+}
+.distortion-item:hover { border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.03); }
+.distortion-item.is-active { border-color: rgba(129, 140, 248, 0.5); background: rgba(129, 140, 248, 0.08); }
+.distortion-box {
+  flex-shrink: 0; margin-top: 1px;
+  width: 18px; height: 18px;
+  border-radius: 0.4rem;
+  border: 1.5px solid rgba(148, 163, 184, 0.4);
+  display: grid; place-items: center;
+  transition: all 0.16s ease;
+}
+.distortion-item.is-active .distortion-box {
+  background: var(--indigo); border-color: var(--indigo);
+}
+.distortion-box svg { width: 12px; height: 12px; color: #0b0f14; opacity: 0; transform: scale(0.5); transition: all 0.16s ease; }
+.distortion-item.is-active .distortion-box svg { opacity: 1; transform: scale(1); }
+.distortion-name { font-size: 0.82rem; font-weight: 500; color: #cbd5e1; line-height: 1.3; }
+.distortion-desc { font-size: 0.7rem; color: #64748b; margin-top: 0.1rem; line-height: 1.35; }
+
+/* ---------- Sliders ---------- */
+.aletheia-slider {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  outline: none;
+  cursor: pointer;
+}
+.aletheia-slider::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #4ade80, #34d399);
+  border: 2px solid #0b0f14;
+  box-shadow: 0 0 0 1px rgba(52,211,153,0.5), 0 4px 12px -2px rgba(52,211,153,0.6);
+  transition: transform 0.14s ease;
+}
+.aletheia-slider::-webkit-slider-thumb:hover { transform: scale(1.15); }
+.aletheia-slider::-webkit-slider-thumb:active { transform: scale(1.05); }
+.aletheia-slider::-moz-range-thumb {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: linear-gradient(180deg, #4ade80, #34d399);
+  border: 2px solid #0b0f14;
+  box-shadow: 0 0 0 1px rgba(52,211,153,0.5), 0 4px 12px -2px rgba(52,211,153,0.6);
+  cursor: pointer;
+}
+.slider-value {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem; font-weight: 600;
+  color: var(--emerald);
+  min-width: 1.5ch; text-align: right;
+}
+.slider-scale {
+  display: flex; justify-content: space-between;
+  font-size: 0.65rem; color: #64748b;
+  margin-top: 0.5rem;
+}
+
+/* ---------- Panels: fade/slide on switch ---------- */
+.panel { animation: panelIn 0.4s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   Breathing guide — the signature element
+   A nested set of geometric rings that expand on the inhale,
+   hold, contract on the exhale, and hold again. One full cycle
+   is 16s (4 phases x 4s).
+   ============================================================ */
+.breath-stage {
+  position: relative;
+  width: 240px; height: 240px;
+  display: grid; place-items: center;
+}
+
+.breath-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid;
+  inset: 0;
+  margin: auto;
+  opacity: 0;
+}
+.breath-ring--1 { width: 150px; height: 150px; border-color: rgba(52, 211, 153, 0.5); }
+.breath-ring--2 { width: 150px; height: 150px; border-color: rgba(52, 211, 153, 0.28); }
+.breath-ring--3 { width: 150px; height: 150px; border-color: rgba(129, 140, 248, 0.22); }
+
+.breath-core {
+  position: relative;
+  width: 130px; height: 130px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 40%, rgba(52, 211, 153, 0.22), rgba(52, 211, 153, 0.04) 70%);
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  box-shadow: 0 0 40px -8px rgba(52, 211, 153, 0.4), inset 0 0 30px -10px rgba(52, 211, 153, 0.5);
+  transition: transform 0.2s ease;
+}
+
+.breath-cue {
+  font-family: "Fraunces", Georgia, serif;
+  font-size: 1.05rem;
+  color: #e2e8f0;
+  letter-spacing: 0.01em;
+  text-align: center;
+  opacity: 0.92;
+}
+
+/* Active animation state (toggled via .is-breathing on .breath-stage) */
+.breath-stage.is-breathing .breath-core {
+  animation: breatheCore calc(var(--breath-phase) * 4) ease-in-out infinite;
+}
+.breath-stage.is-breathing .breath-ring--1 { animation: breatheRing calc(var(--breath-phase) * 4) ease-in-out infinite; }
+.breath-stage.is-breathing .breath-ring--2 { animation: breatheRing calc(var(--breath-phase) * 4) ease-in-out infinite; animation-delay: 0.25s; }
+.breath-stage.is-breathing .breath-ring--3 { animation: breatheRing calc(var(--breath-phase) * 4) ease-in-out infinite; animation-delay: 0.5s; }
+
+@keyframes breatheCore {
+  0%   { transform: scale(0.78); }   /* start inhale */
+  25%  { transform: scale(1.18); }   /* end inhale / begin hold */
+  50%  { transform: scale(1.18); }   /* end hold / begin exhale */
+  75%  { transform: scale(0.78); }   /* end exhale / begin hold */
+  100% { transform: scale(0.78); }   /* end hold */
+}
+@keyframes breatheRing {
+  0%   { transform: scale(0.7);  opacity: 0.15; }
+  25%  { transform: scale(1.5);  opacity: 0.8;  }
+  50%  { transform: scale(1.5);  opacity: 0.6;  }
+  75%  { transform: scale(0.7);  opacity: 0.15; }
+  100% { transform: scale(0.7);  opacity: 0.15; }
+}
+
+/* ---------- History entry card ---------- */
+.entry {
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(23, 29, 38, 0.6), rgba(17, 22, 29, 0.6));
+  padding: 1.1rem 1.25rem;
+  transition: border-color 0.18s ease, transform 0.18s ease;
+  animation: entryIn 0.35s ease backwards;
+}
+.entry:hover { border-color: rgba(255,255,255,0.12); }
+@keyframes entryIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.chip {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  font-size: 0.68rem; font-weight: 500;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #cbd5e1;
+}
+.chip-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+.chip-filter {
+  cursor: pointer;
+  transition: all 0.15s ease;
+  background: rgba(255,255,255,0.02);
+}
+.chip-filter:hover { border-color: rgba(255,255,255,0.22); }
+.chip-filter.is-active {
+  border-color: var(--fc, var(--emerald));
+  background: color-mix(in srgb, var(--fc, var(--emerald)) 16%, transparent);
+  color: #e2e8f0;
+}
+
+/* ---------- Stat card ---------- */
+.stat-card {
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 1rem;
+  background: rgba(255,255,255,0.015);
+  padding: 1rem 1.1rem;
+}
+.stat-value { font-size: 1.6rem; font-weight: 600; color: #e2e8f0; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat-label { font-size: 0.7rem; color: #94a3b8; margin-top: 0.4rem; letter-spacing: 0.02em; }
+
+/* ---------- Toast ---------- */
+.toast {
+  pointer-events: auto;
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 0.8rem;
+  font-size: 0.85rem; font-weight: 500;
+  color: #e2e8f0;
+  background: rgba(23, 29, 38, 0.95);
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,0.8);
+  backdrop-filter: blur(12px);
+  animation: toastIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.toast.toast--out { animation: toastOut 0.3s ease forwards; }
+.toast--ok i { color: var(--emerald); }
+.toast--err i { color: #f87171; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(16px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  to { opacity: 0; transform: translateY(8px) scale(0.98); }
+}
+
+/* ---------- Delete button on entries ---------- */
+.entry-del {
+  color: #64748b;
+  transition: color 0.15s ease;
+}
+.entry-del:hover { color: #f87171; }
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .ambient-orb { animation: none; }
+  /* Keep the breath core legible at a calm mid-scale when motion is off */
+  .breath-stage.is-breathing .breath-core { transform: scale(1); }
+}
+
+/* ---------- Focus visibility (accessibility floor) ---------- */
+:focus-visible {
+  outline: 2px solid var(--emerald);
+  outline-offset: 2px;
+  border-radius: 0.4rem;
+}
+button:focus:not(:focus-visible) { outline: none; }
