@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Aletheia — a local-first tool for tracking thoughts, mapping cognitive patterns, building daily practice, and cultivating self-awareness." />
+  <meta name="theme-color" content="#0b0f14" />
+  <title>Aletheia</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Aletheia" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: { extend: {
+        colors: {
+          ink: { 900:'#0b0f14',800:'#11161d',700:'#171d26',600:'#1f2731',500:'#2a333f' },
+          slatey: { 400:'#94a3b8',300:'#cbd5e1',200:'#e2e8f0' },
+          emerald: { glow:'#34d399' }, indigo: { glow:'#818cf8' },
+        },
+        fontFamily: { sans:['Inter','system-ui','-apple-system','Segoe UI','Roboto','sans-serif'], display:['"Fraunces"','Georgia','serif'] },
+        letterSpacing: { widest2:'0.22em' },
+      } },
+    };
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+
+<body class="bg-ink-900 text-slatey-300 font-sans antialiased min-h-screen selection:bg-emerald-glow/20 selection:text-slatey-200">
+
+  <div class="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden="true">
+    <div class="ambient-orb ambient-orb--emerald"></div>
+    <div class="ambient-orb ambient-orb--indigo"></div>
+    <div class="absolute inset-0 bg-grain opacity-[0.035]"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-30 backdrop-blur-xl bg-ink-900/70 border-b border-white/5">
+    <div class="mx-auto max-w-5xl px-5 sm:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-3 select-none">
+          <div class="relative grid place-items-center w-9 h-9">
+            <svg viewBox="0 0 40 40" class="w-9 h-9 text-emerald-glow" fill="none" stroke="currentColor" stroke-width="1.1">
+              <circle cx="20" cy="20" r="13" class="opacity-40" /><circle cx="20" cy="20" r="8" class="opacity-70" />
+              <circle cx="20" cy="20" r="2.4" fill="currentColor" stroke="none" />
+              <path d="M20 4 L20 9 M20 31 L20 36 M4 20 L9 20 M31 20 L36 20" class="opacity-50" />
+            </svg>
+          </div>
+          <div class="leading-none">
+            <h1 class="font-display text-xl text-slatey-200 tracking-tight">Aletheia</h1>
+            <p class="text-[10px] uppercase tracking-widest2 text-slatey-400 mt-0.5">unconcealment</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button data-action="export" title="Export data as JSON" class="icon-btn" aria-label="Export data"><i data-lucide="download" class="w-[18px] h-[18px]"></i></button>
+          <button data-action="import" title="Import data from JSON" class="icon-btn" aria-label="Import data"><i data-lucide="upload" class="w-[18px] h-[18px]"></i></button>
+          <input type="file" id="import-file" accept="application/json,.json" class="hidden" />
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- TAB NAV -->
+  <nav class="sticky top-16 z-20 backdrop-blur-xl bg-ink-900/60 border-b border-white/5">
+    <div class="mx-auto max-w-5xl px-3 sm:px-8">
+      <div class="flex items-center gap-1 overflow-x-auto no-scrollbar" role="tablist" aria-label="Main sections">
+        <button class="tab-btn is-active" data-tab="log" role="tab" aria-selected="true"><i data-lucide="pen-line" class="w-4 h-4"></i><span>Log</span></button>
+        <button class="tab-btn" data-tab="anchor" role="tab" aria-selected="false"><i data-lucide="orbit" class="w-4 h-4"></i><span>Anchor</span></button>
+        <button class="tab-btn" data-tab="practices" role="tab" aria-selected="false"><i data-lucide="check-square" class="w-4 h-4"></i><span>Practices</span></button>
+        <button class="tab-btn" data-tab="analysis" role="tab" aria-selected="false"><i data-lucide="line-chart" class="w-4 h-4"></i><span>Analysis</span></button>
+        <button class="tab-btn" data-tab="history" role="tab" aria-selected="false"><i data-lucide="scroll-text" class="w-4 h-4"></i><span>History</span></button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="mx-auto max-w-5xl px-5 sm:px-8 pb-32 pt-8">
+
+    <!-- ===== LOG ===== -->
+    <section id="panel-log" class="panel" role="tabpanel" aria-label="Metacognitive log">
+      <div class="mb-7">
+        <h2 class="font-display text-2xl text-slatey-200">The Metacognitive Log</h2>
+        <p class="text-sm text-slatey-400 mt-1">Capture the raw stream, then name what shaped it.</p>
+      </div>
+      <div class="card p-6 sm:p-7">
+        <label for="thought-input" class="field-label">The thought</label>
+        <textarea id="thought-input" rows="4" placeholder="What is moving through your mind right now?"
+          class="w-full resize-none rounded-xl bg-ink-900/60 border border-white/10 px-4 py-3.5 text-[15px] leading-relaxed text-slatey-200 placeholder:text-slatey-400/60 focus:outline-none focus:border-emerald-glow/40 focus:ring-1 focus:ring-emerald-glow/30 transition"></textarea>
+
+        <!-- Emotions -->
+        <div class="mt-7">
+          <div class="flex items-center justify-between">
+            <span class="field-label mb-0">Emotional state</span>
+            <span id="emotion-count" class="text-[11px] text-slatey-400">none yet</span>
+          </div>
+          <div class="relative mt-2">
+            <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slatey-400"></i>
+            <input id="emotion-search" type="search" placeholder="Search feelings…" class="w-full rounded-lg bg-ink-900/60 border border-white/10 pl-9 pr-3 py-2 text-sm text-slatey-200 placeholder:text-slatey-400/60 focus:outline-none focus:border-emerald-glow/40 transition" />
+          </div>
+          <div id="emotion-picker" class="mt-3 space-y-3 max-h-72 overflow-y-auto pr-1"></div>
+          <p class="text-[11px] text-slatey-400/70 mt-2">Pick as many as fit. Naming feelings precisely is a skill in itself.</p>
+        </div>
+
+        <!-- Sliders -->
+        <div class="mt-7 grid sm:grid-cols-2 gap-6">
+          <div>
+            <div class="flex items-center justify-between"><span class="field-label mb-0">Energy</span><span id="energy-value" class="slider-value">5</span></div>
+            <input type="range" id="energy-slider" min="1" max="10" value="5" step="1" class="aletheia-slider mt-3" />
+            <div class="slider-scale"><span>Depleted</span><span>Charged</span></div>
+          </div>
+          <div>
+            <div class="flex items-center justify-between"><span class="field-label mb-0">Clarity</span><span id="clarity-value" class="slider-value">5</span></div>
+            <input type="range" id="clarity-slider" min="1" max="10" value="5" step="1" class="aletheia-slider mt-3" />
+            <div class="slider-scale"><span>Foggy</span><span>Lucid</span></div>
+          </div>
+        </div>
+
+        <!-- Distortions -->
+        <div class="mt-7">
+          <span class="field-label">Cognitive loops present</span>
+          <div id="distortion-grid" class="grid sm:grid-cols-2 gap-2 mt-2"></div>
+        </div>
+
+        <!-- Reframe (appears when a loop is flagged) -->
+        <div id="reframe-wrap" class="mt-5 hidden">
+          <label for="reframe-input" class="field-label">A truer reframe <span class="text-slatey-400/60 normal-case tracking-normal">(optional)</span></label>
+          <textarea id="reframe-input" rows="2" placeholder="If a loop is pulling the thought, what's a more balanced way to see it?"
+            class="w-full resize-none rounded-xl bg-ink-900/60 border border-indigo-glow/20 px-4 py-3 text-[14px] leading-relaxed text-slatey-200 placeholder:text-slatey-400/50 focus:outline-none focus:border-indigo-glow/50 transition"></textarea>
+        </div>
+
+        <div class="mt-8 flex items-center justify-between gap-4">
+          <p class="text-xs text-slatey-400/80 flex items-center gap-1.5"><i data-lucide="clock-3" class="w-3.5 h-3.5"></i><span id="live-timestamp"></span></p>
+          <button data-action="save-thought" class="btn-primary"><i data-lucide="check" class="w-4 h-4"></i><span>Record</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ANCHOR ===== -->
+    <section id="panel-anchor" class="panel hidden" role="tabpanel" aria-label="Meditative anchor">
+      <div class="mb-7">
+        <h2 class="font-display text-2xl text-slatey-200">The Meditative Anchor</h2>
+        <p class="text-sm text-slatey-400 mt-1">Return to the breath. Let the prompt meet you where you are.</p>
+      </div>
+      <div class="grid lg:grid-cols-2 gap-6">
+        <div class="card p-8 grid place-items-center">
+          <div id="breath-patterns" class="flex items-center gap-2 mb-6"></div>
+          <div class="breath-stage">
+            <div class="breath-ring breath-ring--3"></div>
+            <div class="breath-ring breath-ring--2"></div>
+            <div class="breath-ring breath-ring--1"></div>
+            <div id="breath-core" class="breath-core"><span id="breath-cue" class="breath-cue">Begin</span></div>
+          </div>
+          <div class="mt-8 flex items-center gap-3">
+            <button data-action="toggle-breath" id="breath-toggle" class="btn-ghost"><i data-lucide="play" class="w-4 h-4"></i><span>Begin</span></button>
+          </div>
+          <p id="breath-note" class="text-xs text-slatey-400/70 mt-4 tracking-wide text-center"></p>
+        </div>
+
+        <div class="card p-8 flex flex-col">
+          <div class="flex items-center gap-2 text-slatey-400"><i data-lucide="feather" class="w-4 h-4 text-indigo-glow"></i><span class="text-xs uppercase tracking-widest2" id="prompt-school">Reflection</span></div>
+          <blockquote id="prompt-text" class="font-display text-xl sm:text-2xl leading-relaxed text-slatey-200 mt-5 flex-1"></blockquote>
+          <div class="mt-6 flex items-center justify-between">
+            <button data-action="next-prompt" class="btn-ghost"><i data-lucide="shuffle" class="w-4 h-4"></i><span>Another</span></button>
+            <button data-action="prompt-to-log" class="text-xs text-emerald-glow/90 hover:text-emerald-glow inline-flex items-center gap-1.5 transition"><span>Carry to the log</span><i data-lucide="arrow-right" class="w-3.5 h-3.5"></i></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grounding -->
+      <div class="card p-6 sm:p-7 mt-6">
+        <div class="flex items-center gap-2 mb-1"><i data-lucide="anchor" class="w-4 h-4 text-emerald-glow"></i><h3 class="card-title">Grounding · 5-4-3-2-1</h3></div>
+        <p class="card-sub">When the mind races ahead, return to the senses. Move through each step slowly.</p>
+        <div id="grounding-steps" class="mt-4 grid sm:grid-cols-2 lg:grid-cols-5 gap-3"></div>
+      </div>
+    </section>
+
+    <!-- ===== PRACTICES ===== -->
+    <section id="panel-practices" class="panel hidden" role="tabpanel" aria-label="Daily practices">
+      <div class="mb-7 flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h2 class="font-display text-2xl text-slatey-200">Daily Practices</h2>
+          <p class="text-sm text-slatey-400 mt-1">The body, mind, and heart, tended a little each day. <span id="practice-date" class="text-slatey-300"></span></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="mini-stat"><span class="mini-stat-v" id="practice-streak">0</span><span class="mini-stat-l">day streak</span></div>
+          <div class="mini-stat"><span class="mini-stat-v" id="practice-today-count">0 / 11</span><span class="mini-stat-l">today</span></div>
+        </div>
+      </div>
+
+      <div class="card p-6 sm:p-7">
+        <div id="practices-grid" class="space-y-6"></div>
+
+        <div class="mt-7 pt-6 border-t border-white/5">
+          <div class="flex items-center justify-between"><span class="field-label mb-0">Last night's sleep quality</span><span id="sleep-value" class="slider-value">5</span></div>
+          <input type="range" id="sleep-slider" min="1" max="10" value="5" step="1" class="aletheia-slider mt-3" />
+          <div class="slider-scale"><span>Restless</span><span>Deeply rested</span></div>
+          <p class="text-[11px] text-slatey-400/70 mt-3">Your check-in saves automatically. Sleep is tracked separately so Analysis can show how it shapes your clarity.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== ANALYSIS ===== -->
+    <section id="panel-analysis" class="panel hidden" role="tabpanel" aria-label="Analysis">
+      <div class="mb-7 flex items-end justify-between gap-4 flex-wrap">
+        <div>
+          <h2 class="font-display text-2xl text-slatey-200">Analysis</h2>
+          <p class="text-sm text-slatey-400 mt-1">What recurs becomes visible. What is visible can change.</p>
+        </div>
+        <div class="flex items-center gap-2" id="analysis-range">
+          <button class="range-btn" data-range="7">7d</button>
+          <button class="range-btn is-active" data-range="30">30d</button>
+          <button class="range-btn" data-range="90">90d</button>
+          <button class="range-btn" data-range="all">All</button>
+        </div>
+      </div>
+
+      <div id="analysis-empty" class="hidden card p-12 text-center">
+        <div class="mx-auto w-12 h-12 grid place-items-center rounded-full bg-white/5 mb-4"><i data-lucide="sprout" class="w-6 h-6 text-slatey-400"></i></div>
+        <p class="text-slatey-300 font-medium">No entries in this window yet</p>
+        <p class="text-sm text-slatey-400 mt-1">Record a few thoughts and check in on your practices — your analysis takes shape here.</p>
+      </div>
+
+      <div id="analysis-body">
+        <!-- Insights -->
+        <div class="mb-6">
+          <h3 class="section-label"><i data-lucide="sparkles" class="w-4 h-4 text-emerald-glow"></i> What your data suggests</h3>
+          <div id="insight-list" class="grid md:grid-cols-2 gap-3 mt-3"></div>
+          <div id="insight-empty" class="hidden card p-8 text-center mt-3">
+            <p class="text-sm text-slatey-400">Keep logging — insights appear once there's enough to compare. Most need at least a week of entries and a few days of practice check-ins.</p>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div id="stat-cards" class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6"></div>
+
+        <!-- Emotional landscape -->
+        <div class="grid lg:grid-cols-2 gap-6">
+          <div class="card p-6">
+            <h3 class="card-title">Your emotional landscape</h3>
+            <p class="card-sub">Each point is one moment, placed by pleasantness and energy. The diamond is your average.</p>
+            <div class="mt-4 h-80 relative"><canvas id="chart-circumplex"></canvas></div>
+          </div>
+          <div class="card p-6">
+            <h3 class="card-title">Emotional balance over time</h3>
+            <p class="card-sub">Daily average pleasantness, from −1 to +1.</p>
+            <div class="mt-4 h-80 relative"><canvas id="chart-valence"></canvas></div>
+          </div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6 mt-6">
+          <div class="card p-6">
+            <h3 class="card-title">Recurring thinking loops</h3>
+            <p class="card-sub">Which distortions you flag most often.</p>
+            <div class="mt-4 h-72 relative"><canvas id="chart-distortions"></canvas></div>
+          </div>
+          <div class="card p-6">
+            <h3 class="card-title">Mood by day of week</h3>
+            <p class="card-sub">Average balance for each weekday.</p>
+            <div class="mt-4 h-72 relative"><canvas id="chart-weekday"></canvas></div>
+          </div>
+        </div>
+
+        <!-- Practices analysis -->
+        <h3 class="section-label mt-8"><i data-lucide="target" class="w-4 h-4 text-emerald-glow"></i> Practice &amp; behaviour</h3>
+        <div id="practices-analysis-empty" class="hidden card p-8 text-center mt-3">
+          <p class="text-sm text-slatey-400">Check in on your daily practices to see how they relate to your mood and clarity.</p>
+        </div>
+        <div id="practices-analysis" class="mt-3">
+          <div class="card p-6 mb-6">
+            <h3 class="card-title">Balance across the three pillars</h3>
+            <p class="card-sub">How consistently you're tending body, mind, and heart.</p>
+            <div id="pillar-balance" class="mt-5 space-y-4"></div>
+          </div>
+          <div class="grid lg:grid-cols-2 gap-6">
+            <div class="card p-6">
+              <h3 class="card-title">Practice consistency</h3>
+              <p class="card-sub">Share of days each practice was done.</p>
+              <div class="mt-4 h-80 relative"><canvas id="chart-adherence"></canvas></div>
+            </div>
+            <div class="card p-6">
+              <h3 class="card-title">How practices move your mood</h3>
+              <p class="card-sub">Difference in emotional balance on days you did each practice vs days you didn't. Association, not proof.</p>
+              <div class="mt-4 h-80 relative"><canvas id="chart-lift"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== HISTORY ===== -->
+    <section id="panel-history" class="panel hidden" role="tabpanel" aria-label="History">
+      <div class="mb-7">
+        <h2 class="font-display text-2xl text-slatey-200">The History</h2>
+        <p class="text-sm text-slatey-400 mt-1">A timeline of what you noticed.</p>
+      </div>
+      <div class="card p-4 sm:p-5 mb-6">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slatey-400"></i>
+          <input type="search" id="history-search" placeholder="Search your thoughts…" class="w-full rounded-lg bg-ink-900/60 border border-white/10 pl-10 pr-4 py-2.5 text-sm text-slatey-200 placeholder:text-slatey-400/60 focus:outline-none focus:border-emerald-glow/40 transition" />
+        </div>
+        <div class="mt-4 flex flex-col gap-3">
+          <div><span class="filter-label">Emotion family</span><div id="filter-emotions" class="flex flex-wrap gap-1.5 mt-1.5"></div></div>
+          <div><span class="filter-label">Loop</span><div id="filter-distortions" class="flex flex-wrap gap-1.5 mt-1.5"></div></div>
+        </div>
+      </div>
+      <div id="history-feed" class="flex flex-col gap-3"></div>
+      <div id="history-empty" class="hidden card p-12 text-center">
+        <div class="mx-auto w-12 h-12 grid place-items-center rounded-full bg-white/5 mb-4"><i data-lucide="wind" class="w-6 h-6 text-slatey-400"></i></div>
+        <p class="text-slatey-300 font-medium">Nothing here yet</p>
+        <p class="text-sm text-slatey-400 mt-1">Your recorded thoughts will gather here, newest first.</p>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast-host" class="fixed bottom-6 inset-x-0 z-50 flex flex-col items-center gap-2 px-4 pointer-events-none"></div>
+
+  <script src="js/db.js"></script>
+  <script src="js/constants.js"></script>
+  <script src="js/analysis.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
